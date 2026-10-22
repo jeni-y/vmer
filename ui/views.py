@@ -57,22 +57,14 @@ def register(request):
                         username=username, email=email, 
                         phone_number=phone_number, password=password
                     )
-                user.save()
-                auth(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    user.save()
+                    auth(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 
-                return redirect('index')
+                    return redirect('index')
             except ValidationError:
                 error = "Enter a valid email"
 
 
     return render(request, 'ui/register.html',{'error',error})
 
-                user = Sigup.objects.create_user(username = username, email=email, phone_number= phone_number, password= password)
-                user.save()
-                auth(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            
-                return redirect('index')
-            except ValidationError:
-                error = "Please enter a valid email"
 
-    return render(request, 'ui/register.html',{'error',error})
