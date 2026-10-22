@@ -1,8 +1,49 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, logout, login as auth
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
-def login(request):
-    return render(request,'login.html')
+#from .forms import SiginForm
+from .models import Sigup
+
+@login_required
+def home(request):
+    return render(request, 'ui/home.html')
+
+def login_asview(request):
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        username = username.strip()
+        password = password.strip()
+        if not username or not password:
+            error = "Username and password are required and should not be empty"
+
+        else:
+            user = authenticate(request, username = username, password = password)
+            if user is not None:
+                auth(request, user)
+                return redirect('index')
+            else:
+                error = "Wrong username or password"
+    return render(request, 'login.html', {'error':error})
 
 def register(request):
-    return render(request,'register.html')
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username','').strip()
+        email = request.POST.get('email','').strip()
+        phone_number = request.POST.get('phone_number','').strip()
+        password = request.POST.get('password','').strip()
+
+        if not username or not email or not phone_number or not password:
+            error = "Username or email or phone_number or password cannot be empty"
+        else:
+            user = Sigup.objects.create_user(username = username, email=email, phone_number= phone_number, password= password)
+            user.save()
+            auth(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            
+            return redirect('index')
+
+    return render(request, 'ui/register.html',{'error',error})
