@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, logout, login as auth
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email  
 from django.core.exceptions import ValidationError  
+=======
+<<<<<<< Updated upstream
+from django.shortcuts import render
+>>>>>>> cac41ac (Fix merge conflict in ui/views.py)
 
 #from .forms import SiginForm
 from .models import Sigup
@@ -32,6 +37,46 @@ def login_asview(request):
     return render(request, 'login.html', {'error':error})
 
 def register(request):
+<<<<<<< HEAD
+=======
+    return render(request,'register.html')
+=======
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, logout, login as auth
+from django.contrib.auth.decorators import login_required
+from django.core.validators import validate_email  
+from django.core.exceptions import ValidationError  
+from django.db import IntegrityError 
+
+#from .forms import SiginForm
+from .models import Sigup
+
+@login_required
+def home(request):
+    return render(request, 'ui/home.html')
+
+def login_asview(request):
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+
+        username = username.strip()
+        password = password.strip()
+        if not username or not password:
+            error = "Username and password are required and should not be empty"
+
+        else:
+            user = authenticate(request, username = username, password = password)
+            if user is not None:
+                auth(request, user)
+                return redirect('index')
+            else:
+                error = "Wrong username or password"
+    return render(request, 'login.html', {'error':error})
+
+def register(request):
+>>>>>>> cac41ac (Fix merge conflict in ui/views.py)
     error = None
     if request.method == 'POST':
         username = request.POST.get('username','').strip()
@@ -44,6 +89,7 @@ def register(request):
         else:
             try:
                 validate_email(email)
+<<<<<<< HEAD
                 if Sigup.objects.filter(username=username).exists():
                     error = "This username is already taken."
                 elif Sigup.objects.filter(email=email).exists():
@@ -66,3 +112,17 @@ def register(request):
 
 
     return render(request, 'ui/register.html',{'error',error})
+=======
+                user = Sigup.objects.create_user(username = username, email=email, phone_number= phone_number, password= password)
+                user.save()
+                auth(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            
+                return redirect('index')
+            except ValidationError:
+                error = "Please enter a valid email"
+            except IntegrityError:
+                error = "already taken"
+
+    return render(request, 'ui/register.html',{'error',error})
+>>>>>>> Stashed changes
+>>>>>>> cac41ac (Fix merge conflict in ui/views.py)
