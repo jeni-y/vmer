@@ -5,10 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 
-@login_required
-def home(request):
-    username = request.user.username
-    return render(request, 'home.html', {'username': username})
+
 
 # Create your views here.
 def login(request):
@@ -33,7 +30,7 @@ def login_verify(request):
             user = authenticate(request, username = username, password = password)
             if user is not None:
                 auth_login(request, user)
-                return redirect('home')
+                return redirect('index')
             else:
                 error = "Wrong username or password"
     return render(request, 'login.html', {'error':error})
@@ -75,6 +72,16 @@ def register_user(request):
 
     return render(request, 'register.html', {'error': error})
 
-@login_required
+
 def home(request):
     return render(request, 'home.html')
+
+@login_required
+def index(request):
+    return render(request,'index.html',{'username':request.user.username})
+
+def vm(request):
+    return render(request,'vm.html')
+
+def later(request):
+    return render(request,'later.html')

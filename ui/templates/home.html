@@ -1,1 +1,346 @@
-hi
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Server Console</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body>
+    
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top border-bottom border-secondary-subtle">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="bi bi-hdd-rack-fill text-primary me-2"></i>Home Server Console
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#how">How it works</a></li>
+          <li class="nav-item"><a class="nav-link" href="#roadmap">Roadmap</a></li>
+        </ul>
+        <div class="d-flex gap-2">
+          <a href="/login/" class="btn btn-outline-light">Log in</a>
+          <a href="/register/" class="btn btn-primary">Get started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="bg-body-secondary bg-gradient py-5">
+    <div class="container py-lg-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <span class="badge text-bg-primary rounded-pill px-3 py-2 mb-3">
+            <i class="bi bi-lightning-charge-fill me-1"></i>Your own cloud console
+          </span>
+          <h1 class="display-3 fw-bold mb-3">
+            Run your server <span class="text-primary" id="typed"></span><span class="text-primary">|</span>
+          </h1>
+          <p class="lead text-body-secondary mb-4">
+            Monitor your Ubuntu host, deploy virtual machines, and manage containers from one clean dashboard, like AWS, but on your own hardware.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="/register/" class="btn btn-primary btn-lg px-4">
+              <i class="bi bi-rocket-takeoff me-2"></i>Create free account
+            </a>
+            <a href="#how" class="btn btn-outline-light btn-lg px-4">See how it works</a>
+          </div>
+          <div class="d-flex flex-wrap gap-4 mt-4 text-body-secondary small">
+            <span><i class="bi bi-shield-check text-success me-1"></i>Least-privilege design</span>
+            <span><i class="bi bi-journal-check text-success me-1"></i>Audited actions</span>
+            <span><i class="bi bi-code-slash text-success me-1"></i>Open and self-hosted</span>
+          </div>
+        </div>
+
+        <!-- Live dashboard preview -->
+        <div class="col-lg-6">
+          <div class="card border-secondary shadow-lg">
+            <div class="card-header d-flex align-items-center gap-2 bg-body-tertiary">
+              <span class="badge rounded-pill text-bg-danger">&nbsp;</span>
+              <span class="badge rounded-pill text-bg-warning">&nbsp;</span>
+              <span class="badge rounded-pill text-bg-success">&nbsp;</span>
+              <small class="ms-2 text-body-secondary">ubuntu-server-01</small>
+              <span class="ms-auto badge text-bg-success"><i class="bi bi-circle-fill me-1"></i>Online</span>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="d-flex justify-content-between small"><span>CPU</span><span id="cpu-val">0%</span></div>
+                <div class="progress" role="progressbar" aria-label="CPU usage">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated" id="cpu-bar" style="width:0%"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between small"><span>Memory</span><span id="mem-val">0%</span></div>
+                <div class="progress" role="progressbar" aria-label="Memory usage">
+                  <div class="progress-bar bg-info" id="mem-bar" style="width:0%"></div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <div class="d-flex justify-content-between small"><span>Disk</span><span id="disk-val">0%</span></div>
+                <div class="progress" role="progressbar" aria-label="Disk usage">
+                  <div class="progress-bar bg-warning" id="disk-bar" style="width:0%"></div>
+                </div>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                  <span><i class="bi bi-pc-display text-primary me-2"></i>web-server-1</span>
+                  <span class="badge text-bg-success">running</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                  <span><i class="bi bi-pc-display text-primary me-2"></i>test-vm</span>
+                  <span class="badge text-bg-secondary">stopped</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                  <span><i class="bi bi-box-seam text-info me-2"></i>nginx-container</span>
+                  <span class="badge text-bg-success">running</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats strip -->
+  <section class="border-top border-bottom border-secondary-subtle bg-body-tertiary py-4">
+    <div class="container">
+      <div class="row text-center g-3">
+        <div class="col-6 col-md-3">
+          <div class="display-6 fw-bold text-primary"><span class="counter" data-target="10">0</span>s</div>
+          <div class="text-body-secondary small">Monitoring interval</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="display-6 fw-bold text-primary"><span class="counter" data-target="3">0</span></div>
+          <div class="text-body-secondary small">Resources managed</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="display-6 fw-bold text-primary"><span class="counter" data-target="100">0</span>%</div>
+          <div class="text-body-secondary small">Self-hosted</div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="display-6 fw-bold text-primary"><span class="counter" data-target="24">0</span>/7</div>
+          <div class="text-body-secondary small">Collector uptime</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-5">
+    <div class="container py-lg-4">
+      <div class="text-center mb-5">
+        <h2 class="display-6 fw-bold">Everything your server needs</h2>
+        <p class="text-body-secondary">Start with monitoring today. Grow into a full control plane.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body p-4">
+              <div class="text-bg-primary rounded-3 d-inline-flex p-3 mb-3"><i class="bi bi-speedometer2 fs-3"></i></div>
+              <h3 class="h5">Live monitoring</h3>
+              <p class="text-body-secondary mb-0">CPU, memory, disk, uptime, load, and listening ports, collected every 10 seconds.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body p-4">
+              <div class="text-bg-success rounded-3 d-inline-flex p-3 mb-3"><i class="bi bi-pc-display-horizontal fs-3"></i></div>
+              <h3 class="h5">Deploy VMs</h3>
+              <p class="text-body-secondary mb-0">Pick an OS, CPU, memory, and disk, then launch a virtual machine in a few clicks.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body p-4">
+              <div class="text-bg-info rounded-3 d-inline-flex p-3 mb-3"><i class="bi bi-box-seam fs-3"></i></div>
+              <h3 class="h5">Docker containers</h3>
+              <p class="text-body-secondary mb-0">See every container, its state and ports, and start or stop it safely.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body p-4">
+              <div class="text-bg-warning rounded-3 d-inline-flex p-3 mb-3"><i class="bi bi-shield-lock fs-3"></i></div>
+              <h3 class="h5">Secure by design</h3>
+              <p class="text-body-secondary mb-0">Role-based permissions, an allowlist of actions, and no open shell access.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body p-4">
+              <div class="text-bg-danger rounded-3 d-inline-flex p-3 mb-3"><i class="bi bi-journal-text fs-3"></i></div>
+              <h3 class="h5">Audit log</h3>
+              <p class="text-body-secondary mb-0">Every start, stop, and deploy is recorded with who did it and when.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body p-4">
+              <div class="text-bg-secondary rounded-3 d-inline-flex p-3 mb-3"><i class="bi bi-diagram-3 fs-3"></i></div>
+              <h3 class="h5">Multi-server ready</h3>
+              <p class="text-body-secondary mb-0">Built so you can add more servers and cloud providers later without a rewrite.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="bg-body-tertiary py-5">
+    <div class="container py-lg-4">
+      <div class="text-center mb-5">
+        <h2 class="display-6 fw-bold">From login to running VM in three steps</h2>
+      </div>
+      <div class="row g-4 text-center">
+        <div class="col-md-4">
+          <div class="rounded-circle text-bg-primary d-inline-flex align-items-center justify-content-center mb-3 fs-3 fw-bold" style="width:64px;height:64px">1</div>
+          <h3 class="h5">Create your account</h3>
+          <p class="text-body-secondary">Register and log in to your private dashboard.</p>
+        </div>
+        <div class="col-md-4">
+          <div class="rounded-circle text-bg-primary d-inline-flex align-items-center justify-content-center mb-3 fs-3 fw-bold" style="width:64px;height:64px">2</div>
+          <h3 class="h5">Choose your VM</h3>
+          <p class="text-body-secondary">Set the name, operating system, and resources.</p>
+        </div>
+        <div class="col-md-4">
+          <div class="rounded-circle text-bg-primary d-inline-flex align-items-center justify-content-center mb-3 fs-3 fw-bold" style="width:64px;height:64px">3</div>
+          <h3 class="h5">Deploy and manage</h3>
+          <p class="text-body-secondary">Start, stop, and watch it run from the dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap" class="py-5">
+    <div class="container py-lg-4">
+      <div class="text-center mb-5">
+        <h2 class="display-6 fw-bold">Roadmap</h2>
+        <p class="text-body-secondary">Built in stages, one solid layer at a time.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="card h-100 border-success">
+            <div class="card-body">
+              <span class="badge text-bg-success mb-2">Phase 1</span>
+              <h3 class="h6">Host monitoring</h3>
+              <p class="text-body-secondary small mb-0">Metrics, ports, and services.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100 border-primary">
+            <div class="card-body">
+              <span class="badge text-bg-primary mb-2">Phase 2</span>
+              <h3 class="h6">Docker and VMs</h3>
+              <p class="text-body-secondary small mb-0">Inventory, start, stop, deploy.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body">
+              <span class="badge text-bg-secondary mb-2">Phase 3</span>
+              <h3 class="h6">App deployment</h3>
+              <p class="text-body-secondary small mb-0">Domains, HTTPS, logs.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100 border-secondary-subtle">
+            <div class="card-body">
+              <span class="badge text-bg-secondary mb-2">Phase 4</span>
+              <h3 class="h6">Mini PaaS</h3>
+              <p class="text-body-secondary small mb-0">Multi-server and cloud links.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to action -->
+  <section class="bg-primary bg-gradient py-5">
+    <div class="container text-center py-lg-3">
+      <h2 class="display-6 fw-bold text-white">Ready to take control of your server?</h2>
+      <p class="lead text-white-50 mb-4">Create your account and deploy your first VM today.</p>
+      <a href="/register/" class="btn btn-light btn-lg px-5 me-2">Get started</a>
+      <a href="/login/" class="btn btn-outline-light btn-lg px-5">Log in</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-body-tertiary py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-body-secondary small">
+      <span><i class="bi bi-hdd-rack-fill text-primary me-1"></i>Home Server Console &copy; <span id="year"></span></span>
+      <span>Built with Django, PostgreSQL, and Bootstrap</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Typing effect in the headline
+    const words = ['from anywhere.', 'with one click.', 'on your terms.', 'like a cloud.'];
+    let w = 0, c = 0, deleting = false;
+    const typedEl = document.getElementById('typed');
+    function type() {
+      const word = words[w];
+      typedEl.textContent = word.substring(0, c);
+      if (!deleting && c < word.length) { c++; setTimeout(type, 90); }
+      else if (!deleting) { deleting = true; setTimeout(type, 1400); }
+      else if (c > 0) { c--; setTimeout(type, 45); }
+      else { deleting = false; w = (w + 1) % words.length; setTimeout(type, 300); }
+    }
+    type();
+
+    // Fake live metrics in the preview card
+    function setBar(id, value) {
+      document.getElementById(id + '-bar').style.width = value + '%';
+      document.getElementById(id + '-val').textContent = value + '%';
+    }
+    function tick() {
+      setBar('cpu', Math.round(15 + Math.random() * 45));
+      setBar('mem', Math.round(40 + Math.random() * 20));
+      setBar('disk', 47);
+    }
+    tick();
+    setInterval(tick, 2000);
+
+    // Count-up numbers when they scroll into view
+    const counters = document.querySelectorAll('.counter');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = +el.dataset.target;
+        let n = 0;
+        const step = Math.max(1, Math.ceil(target / 40));
+        const timer = setInterval(() => {
+          n = Math.min(n + step, target);
+          el.textContent = n;
+          if (n >= target) clearInterval(timer);
+        }, 30);
+        observer.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(el => observer.observe(el));
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

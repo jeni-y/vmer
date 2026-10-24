@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | Home Server Console</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <div class="row min-vh-100">
+    <!-- Sidebar (desktop) / Offcanvas (mobile) -->
+    <div class="offcanvas-lg offcanvas-start col-lg-2 bg-body-tertiary border-end border-secondary-subtle p-0" tabindex="-1" id="sidebar">
+      <div class="offcanvas-header border-bottom border-secondary-subtle">
+        <span class="fw-bold"><i class="bi bi-hdd-rack-fill text-primary me-2"></i>Home Server</span>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body d-flex flex-column p-3">
+        <a class="d-none d-lg-block navbar-brand fw-bold fs-5 mb-4 text-decoration-none text-body" href="#">
+          <i class="bi bi-hdd-rack-fill text-primary me-2"></i>Home Server
+        </a>
+        <ul class="nav nav-pills flex-column gap-1 mb-auto">
+          <li class="nav-item"><a class="nav-link active" href="#overview"><i class="bi bi-speedometer2 me-2"></i>Overview</a></li>
+          <li class="nav-item"><a class="nav-link text-body" href="/vm/"><i class="bi bi-pc-display me-2"></i>Virtual machines</a></li>
+          <li class="nav-item"><a class="nav-link text-body" href="/later/"><i class="bi bi-box-seam me-2"></i>Containers</a></li>
+          <li class="nav-item"><a class="nav-link text-body" href="/later/"><i class="bi bi-ethernet me-2"></i>Listening ports</a></li>
+          <li class="nav-item"><a class="nav-link text-body" href="#activity"><i class="bi bi-journal-text me-2"></i>Activity log</a></li>
+          <li class="nav-item"><a class="nav-link text-body" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+        </ul>
+        <div class="card bg-body border-secondary-subtle mt-4">
+          <div class="card-body p-3">
+            <div class="small text-body-secondary">Server</div>
+            <div class="fw-semibold">ubuntu-server-01</div>
+            <div class="small text-body-secondary mt-2">Uptime</div>
+            <div class="fw-semibold" id="uptime">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <main class="col-lg-10 ms-auto p-0">
+
+      <!-- Top bar -->
+      <nav class="navbar bg-body-tertiary border-bottom border-secondary-subtle px-3 sticky-top">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-label="Open menu">
+            <i class="bi bi-list"></i>
+          </button>
+          <span class="badge text-bg-success"><i class="bi bi-circle-fill me-1"></i>Collector healthy</span>
+          <small class="text-body-secondary d-none d-md-inline">Updated <span id="updated">just now</span></small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deployModal">
+            <i class="bi bi-plus-lg me-1"></i>Deploy VM
+          </button>
+          <div class="dropdown">
+            <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle me-1"></i><span id="username">{{ username }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+             
+<li>
+  <form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="dropdown-item text-danger">
+      <i class="bi bi-box-arrow-right me-2"></i>Log out
+    </button>
+  </form>
+</li>
+
+          </div>
+        </div>
+      </nav>
+
+      <div class="p-3 p-md-4">
+
+        <!-- Welcome -->
+        <div class="mb-4">
+          <h1 class="h3 fw-bold mb-1">Welcome back, <span id="welcome-name">admin</span></h1>
+          <p class="text-body-secondary mb-0">Here is what is happening on your server right now.</p>
+        </div>
+
+        <!-- Stat cards -->
+        <section id="overview" class="row g-3 mb-4">
+          <div class="col-6 col-xl-3">
+            <div class="card border-secondary-subtle h-100"><div class="card-body">
+              <div class="d-flex justify-content-between"><span class="text-body-secondary small">CPU</span><i class="bi bi-cpu text-primary fs-5"></i></div>
+              <div class="h2 fw-bold my-1" id="cpu-val">0%</div>
+              <div class="progress" style="height:6px" role="progressbar" aria-label="CPU"><div class="progress-bar" id="cpu-bar" style="width:0%"></div></div>
+              <div class="small text-body-secondary mt-2">8 logical cores</div>
+            </div></div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="card border-secondary-subtle h-100"><div class="card-body">
+              <div class="d-flex justify-content-between"><span class="text-body-secondary small">Memory</span><i class="bi bi-memory text-info fs-5"></i></div>
+              <div class="h2 fw-bold my-1" id="mem-val">0%</div>
+              <div class="progress" style="height:6px" role="progressbar" aria-label="Memory"><div class="progress-bar bg-info" id="mem-bar" style="width:0%"></div></div>
+              <div class="small text-body-secondary mt-2" id="mem-detail">-- of 16 GB</div>
+            </div></div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="card border-secondary-subtle h-100"><div class="card-body">
+              <div class="d-flex justify-content-between"><span class="text-body-secondary small">Disk</span><i class="bi bi-device-hdd text-warning fs-5"></i></div>
+              <div class="h2 fw-bold my-1" id="disk-val">0%</div>
+              <div class="progress" style="height:6px" role="progressbar" aria-label="Disk"><div class="progress-bar bg-warning" id="disk-bar" style="width:0%"></div></div>
+              <div class="small text-body-secondary mt-2">235 GB of 500 GB used</div>
+            </div></div>
+          </div>
+          <div class="col-6 col-xl-3">
+            <div class="card border-secondary-subtle h-100"><div class="card-body">
+              <div class="d-flex justify-content-between"><span class="text-body-secondary small">Running</span><i class="bi bi-activity text-success fs-5"></i></div>
+              <div class="h2 fw-bold my-1"><span id="run-vms">0</span> VMs</div>
+              <div class="small text-body-secondary mt-3"><span id="run-containers">0</span> containers running</div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- Chart + Activity -->
+        <div class="row g-3 mb-4">
+          <div class="col-xl-8">
+            <div class="card border-secondary-subtle h-100">
+              <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">CPU and memory, last 5 minutes</span>
+                <span class="badge text-bg-secondary">10s interval</span>
+              </div>
+              <div class="card-body"><canvas id="chart" height="110"></canvas></div>
+            </div>
+          </div>
+          <div class="col-xl-4" id="activity">
+            <div class="card border-secondary-subtle h-100">
+              <div class="card-header bg-transparent fw-semibold">Recent activity</div>
+              <ul class="list-group list-group-flush" id="activity-list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- VMs -->
+        <section id="vms" class="card border-secondary-subtle mb-4">
+          <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Virtual machines</span>
+            <button class="btn btn-sm btn-outline-secondary" id="refresh-btn"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead><tr><th>Name</th><th>OS</th><th>vCPU</th><th>Memory</th><th>Disk</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+              <tbody id="vm-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+     
+
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<!-- Deploy VM modal -->
+<div class="modal fade" id="deployModal" tabindex="-1" aria-labelledby="deployTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <form class="modal-content" id="deploy-form" method="POST" action="{% url 'vm' %}">
+      {% csrf_token %}
+
+      <div class="modal-header">
+        <h2 class="modal-title h5" id="deployTitle">Deploy a virtual machine</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label for="vm-name" class="form-label">VM name</label>
+            <input type="text" class="form-control" id="vm-name"
+                   name="vm_name" placeholder="web-server-2"
+                   pattern="[a-z0-9\-]{3,30}" required>
+            <div class="form-text">Lowercase letters, numbers, and dashes.</div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="vm-os" class="form-label">Operating system</label>
+            <select class="form-select" id="vm-os" name="os">
+              <option value="ubuntu-24.04">Ubuntu 24.04 LTS</option>
+              <option value="ubuntu-22.04">Ubuntu 22.04 LTS</option>
+              <option value="debian-12">Debian 12</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="vm-size" class="form-label">VM size</label>
+            <select class="form-select" id="vm-size" name="vm_size" required>
+              <option value="small">Small — 1 vCPU, 2 GB RAM</option>
+              <option value="medium">Medium — 2 vCPU, 4 GB RAM</option>
+              <option value="large">Large — 4 vCPU, 8 GB RAM</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="disk-size" class="form-label">Root disk size (GB)</label>
+            <input type="number" class="form-control" id="disk-size"
+                   name="disk_size" min="20" max="500" value="30" required>
+          </div>
+
+          <div class="col-12">
+            <label for="ssh-key" class="form-label">SSH public key</label>
+            <textarea class="form-control" id="ssh-key" name="ssh_public_key"
+                      rows="3"
+                      placeholder="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@machine"
+                      required></textarea>
+            <div class="form-text">
+              Paste your public key, usually from ~/.ssh/id_ed25519.pub.
+              Never upload or share your private key.
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label for="network-access" class="form-label">Inbound network access</label>
+            <select class="form-select" id="network-access" name="network_access">
+              <option value="ssh">SSH (port 22) only</option>
+              <option value="web">SSH + HTTP + HTTPS (ports 22, 80, 443)</option>
+            </select>
+            <div class="form-text">
+              Restrict SSH to trusted IP addresses in your firewall settings.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="deploy-btn">Deploy VM</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Toasts -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="toast" class="toast align-items-center border-0" role="status" aria-live="polite">
+    <div class="d-flex">
+      <div class="toast-body" id="toast-body"></div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  // ---------- Config: change to match your Django URLs ----------
+  const DEMO_MODE = true;   // set to false when your API is ready
+  const API = {
+    stats: '/api/stats/',                 // { cpu, memory, disk, uptime, containers_running }
+    vms: '/api/vms/',                     // GET list, POST create
+    vmAction: (id, a) => `/api/vms/${id}/${a}/`,   // start | stop | delete
+    containers: '/api/containers/',
+    ports: '/api/ports/',
+    activity: '/api/activity/'
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const getCookie = (n) => { const m = document.cookie.match(new RegExp('(^| )' + n + '=([^;]+)')); return m ? decodeURIComponent(m[2]) : ''; };
+
+  // ---------- Demo data ----------
+  const demo = {
+    vms: [
+      { id: 1, name: 'web-server-1', os: 'Ubuntu 24.04 LTS', vcpus: 2, memory_gb: 2, disk_gb: 20, status: 'running' },
+      { id: 2, name: 'db-server', os: 'Debian 12', vcpus: 4, memory_gb: 4, disk_gb: 80, status: 'running' },
+      { id: 3, name: 'test-vm', os: 'Ubuntu 22.04 LTS', vcpus: 1, memory_gb: 1, disk_gb: 10, status: 'stopped' }
+    ],
+    nextId: 4,
+    containers: [
+      { name: 'nginx', image: 'nginx:1.27', ports: '80, 443', state: 'running' },
+      { name: 'redis', image: 'redis:7', ports: '6379', state: 'running' },
+      { name: 'old-api', image: 'api:0.9', ports: '-', state: 'exited' }
+    ],
+    ports: [
+      { port: 22, protocol: 'TCP', process: 'sshd' },
+      { port: 80, protocol: 'TCP', process: 'docker-proxy' },
+      { port: 443, protocol: 'TCP', process: 'docker-proxy' },
+      { port: 5432, protocol: 'TCP', process: 'postgres' }
+    ],
+    activity: [
+      { text: 'admin started web-server-1', when: '2 min ago', icon: 'play-circle', color: 'success' },
+      { text: 'admin deployed db-server', when: '1 hour ago', icon: 'plus-circle', color: 'primary' },
+      { text: 'admin stopped test-vm', when: 'Yesterday', icon: 'stop-circle', color: 'secondary' },
+      { text: 'admin logged in', when: 'Yesterday', icon: 'box-arrow-in-right', color: 'info' }
+    ],
+    start: Date.now() - 3 * 86400000 - 5 * 3600000
+  };
+
+  async function api(url, method = 'GET', body = null) {
+    if (DEMO_MODE) return demoApi(url, method, body);
+    const res = await fetch(url, {
+      method, credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+      body: body ? JSON.stringify(body) : null
+    });
+    if (res.status === 401 || res.status === 403) { window.location.href = '/login/'; return; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Request failed (' + res.status + ')');
+    return data;
+  }
+
+  async function demoApi(url, method, body) {
+    await new Promise(r => setTimeout(r, 150));
+    if (url === API.stats) {
+      return {
+        cpu: Math.round(15 + Math.random() * 40),
+        memory: Math.round(45 + Math.random() * 15),
+        disk: 47,
+        uptime: Math.floor((Date.now() - demo.start) / 1000),
+        containers_running: demo.containers.filter(c => c.state === 'running').length
+      };
+    }
+    if (url === API.vms && method === 'GET') return demo.vms;
+    if (url === API.vms && method === 'POST') {
+      const vm = { id: demo.nextId++, name: body.name, os: body.os, vcpus: body.vcpus, memory_gb: body.memory_gb, disk_gb: body.disk_gb, status: 'running' };
+      demo.vms.push(vm);
+      demo.activity.unshift({ text: 'admin deployed ' + vm.name, when: 'just now', icon: 'plus-circle', color: 'primary' });
+      return vm;
+    }
+    if (url === API.containers) return demo.containers;
+    if (url === API.ports) return demo.ports;
+    if (url === API.activity) return demo.activity.slice(0, 6);
+    const m = url.match(/\/api\/vms\/(\d+)\/(\w+)\//);
+    if (m) {
+      const vm = demo.vms.find(v => v.id == m[1]);
+      if (!vm) return {};
+      if (m[2] === 'delete') demo.vms = demo.vms.filter(v => v.id != m[1]);
+      else vm.status = m[2] === 'start' ? 'running' : 'stopped';
+      demo.activity.unshift({ text: 'admin ' + m[2] + (m[2] === 'stop' ? 'ped ' : m[2] === 'start' ? 'ed ' : 'd ') + vm.name, when: 'just now', icon: 'lightning', color: 'warning' });
+      return {};
+    }
+  }
+
+  // ---------- UI helpers ----------
+  function toast(message, type = 'success') {
+    const el = $('toast');
+    el.className = 'toast align-items-center border-0 text-bg-' + type;
+    $('toast-body').textContent = message;
+    bootstrap.Toast.getOrCreateInstance(el, { delay: 3500 }).show();
+  }
+
+  function cell(text, cls) {
+    const td = document.createElement('td');
+    td.textContent = text;
+    if (cls) td.className = cls;
+    return td;
+  }
+
+  function badge(text, color) {
+    const s = document.createElement('span');
+    s.className = 'badge text-bg-' + color;
+    s.textContent = text;
+    return s;
+  }
+
+  function formatUptime(sec) {
+    const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60);
+    return d + 'd ' + h + 'h ' + m + 'm';
+  }
+
+  // ---------- Chart ----------
+  const labels = [], cpuData = [], memData = [];
+  const chart = new Chart($('chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'CPU %', data: cpuData, borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,.15)', fill: true, tension: .35, pointRadius: 0 },
+        { label: 'Memory %', data: memData, borderColor: '#0dcaf0', backgroundColor: 'rgba(13,202,240,.1)', fill: true, tension: .35, pointRadius: 0 }
+      ]
+    },
+    options: {
+      animation: false,
+      scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,.08)' } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } } },
+      plugins: { legend: { labels: { color: '#adb5bd' } } }
+    }
+  });
+
+  // ---------- Loaders ----------
+  async function loadStats() {
+    try {
+      const s = await api(API.stats);
+      if (!s) return;
+      $('cpu-val').textContent = s.cpu + '%';       $('cpu-bar').style.width = s.cpu + '%';
+      $('mem-val').textContent = s.memory + '%';    $('mem-bar').style.width = s.memory + '%';
+      $('disk-val').textContent = s.disk + '%';     $('disk-bar').style.width = s.disk + '%';
+      $('mem-detail').textContent = (16 * s.memory / 100).toFixed(1) + ' GB of 16 GB';
+      $('uptime').textContent = formatUptime(s.uptime);
+      $('run-containers').textContent = s.containers_running;
+      $('updated').textContent = new Date().toLocaleTimeString();
+
+      labels.push(new Date().toLocaleTimeString([], { minute: '2-digit', second: '2-digit' }));
+      cpuData.push(s.cpu); memData.push(s.memory);
+      if (labels.length > 30) { labels.shift(); cpuData.shift(); memData.shift(); }
+      chart.update();
+    } catch (e) { /* keep last values; do not treat as stopped */ }
+  }
+
+  async function loadVMs() {
+    try {
+      const vms = await api(API.vms);
+      const tbody = $('vm-table');
+      tbody.innerHTML = '';
+      $('run-vms').textContent = vms.filter(v => v.status === 'running').length;
+
+      if (!vms.length) {
+        const tr = document.createElement('tr');
+        const td = cell('No virtual machines yet. Click "Deploy VM" to create your first one.', 'text-center text-body-secondary py-4');
+        td.colSpan = 7; tr.appendChild(td); tbody.appendChild(tr);
+        return;
+      }
+
+      vms.forEach(vm => {
+        const tr = document.createElement('tr');
+        tr.appendChild(cell(vm.name, 'fw-semibold'));
+        tr.appendChild(cell(vm.os));
+        tr.appendChild(cell(vm.vcpus));
+        tr.appendChild(cell(vm.memory_gb + ' GB'));
+        tr.appendChild(cell(vm.disk_gb + ' GB'));
+        const st = document.createElement('td');
+        st.appendChild(badge(vm.status, vm.status === 'running' ? 'success' : 'secondary'));
+        tr.appendChild(st);
+
+        const act = document.createElement('td');
+        act.className = 'text-end';
+        const g = document.createElement('div');
+        g.className = 'btn-group btn-group-sm';
+        const buttons = vm.status === 'running'
+          ? [['stop', 'Stop', 'btn-outline-warning', 'stop-fill']]
+          : [['start', 'Start', 'btn-outline-success', 'play-fill']];
+        buttons.push(['delete', 'Delete', 'btn-outline-danger', 'trash']);
+        buttons.forEach(([a, label, cls, icon]) => {
+          const b = document.createElement('button');
+          b.className = 'btn ' + cls;
+          b.innerHTML = '<i class="bi bi-' + icon + ' me-1"></i>' + label;
+          b.addEventListener('click', () => vmAction(vm, a));
+          g.appendChild(b);
+        });
+        act.appendChild(g);
+        tr.appendChild(act);
+        tbody.appendChild(tr);
+      });
+    } catch (e) { toast(e.message, 'danger'); }
+  }
+
+  async function loadContainers() {
+    try {
+      const list = await api(API.containers);
+      const tbody = $('container-table');
+      tbody.innerHTML = '';
+      list.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.appendChild(cell(c.name, 'fw-semibold'));
+        tr.appendChild(cell(c.image, 'text-body-secondary'));
+        tr.appendChild(cell(c.ports));
+        const st = document.createElement('td');
+        st.appendChild(badge(c.state, c.state === 'running' ? 'success' : 'secondary'));
+        tr.appendChild(st);
+        tbody.appendChild(tr);
+      });
+    } catch (e) {}
+  }
+
+  async function loadPorts() {
+    try {
+      const list = await api(API.ports);
+      const tbody = $('port-table');
+      tbody.innerHTML = '';
+      list.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.appendChild(cell(p.port, 'fw-semibold'));
+        tr.appendChild(cell(p.protocol));
+        tr.appendChild(cell(p.process, 'text-body-secondary'));
+        tbody.appendChild(tr);
+      });
+    } catch (e) {}
+  }
+
+  async function loadActivity() {
+    try {
+      const list = await api(API.activity);
+      const ul = $('activity-list');
+      ul.innerHTML = '';
+      list.forEach(a => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item bg-transparent d-flex gap-3 align-items-start';
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-' + a.icon + ' text-' + a.color + ' fs-5';
+        const box = document.createElement('div');
+        const t = document.createElement('div'); t.textContent = a.text;
+        const w = document.createElement('small'); w.className = 'text-body-secondary'; w.textContent = a.when;
+        box.appendChild(t); box.appendChild(w);
+        li.appendChild(icon); li.appendChild(box);
+        ul.appendChild(li);
+      });
+    } catch (e) {}
+  }
+
+  // ---------- Actions ----------
+  async function vmAction(vm, action) {
+    if (action === 'delete' && !confirm('Delete "' + vm.name + '"? This cannot be undone.')) return;
+    try {
+      await api(API.vmAction(vm.id, action), 'POST');
+      toast('VM "' + vm.name + '": ' + action + ' requested.');
+      loadVMs(); loadActivity();
+    } catch (e) { toast(e.message, 'danger'); }
+  }
+
+  $('deploy-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('deploy-btn');
+    btn.disabled = true; btn.textContent = 'Deploying...';
+    try {
+      const vm = await api(API.vms, 'POST', {
+        name: $('vm-name').value.trim(),
+        os: $('vm-os').value,
+        vcpus: parseInt($('vm-vcpu').value, 10),
+        memory_gb: parseInt($('vm-ram').value, 10),
+        disk_gb: parseInt($('vm-disk').value, 10)
+      });
+      bootstrap.Modal.getInstance($('deployModal')).hide();
+      $('deploy-form').reset();
+      toast('VM "' + vm.name + '" deployed.');
+      loadVMs(); loadActivity();
+    } catch (err) {
+      toast(err.message, 'danger');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Deploy VM';
+    }
+  });
+
+  $('refresh-btn').addEventListener('click', () => { loadStats(); loadVMs(); loadContainers(); loadPorts(); loadActivity(); });
+
+  // ---------- Start ----------
+  loadStats(); loadVMs(); loadContainers(); loadPorts(); loadActivity();
+  setInterval(loadStats, 10000);   // matches the 10s collector interval
+  if (DEMO_MODE) setInterval(loadStats, 2000);   // faster in demo so the chart moves
+</script>
+</body>
+</html>
