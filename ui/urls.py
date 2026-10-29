@@ -5,8 +5,8 @@ from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('login/', views.login, name='login'),
-    path('register/',views.register,name='register'),
+    # path('login/', views.login, name='login'),
+    # path('register/',views.register,name='register'),
     path('login_verify/',views.login_verify,name='login_verify'),
     #path('login/', LoginView.as_view(template_name='login.html', redirect_authenticated_user=True), name='login'),
     #LOGIN_URL = '/login/'
