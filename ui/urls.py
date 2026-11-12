@@ -16,6 +16,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register_user/',views.register_user,name='register_user'),
     path('index/',views.index, name='index'),
-    path('vm/',views.vm,name='vm'),
+    path('vm_data/',views.vm_data,name='vm_data'),
     path('later/',views.later,name='later'),
 ]

@@ -4,6 +4,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
+from .models import VirtualMachine
 
 
 
@@ -79,9 +80,17 @@ def home(request):
 @login_required
 def index(request):
     return render(request,'index.html',{'username':request.user.username})
+@login_required
+def vm_data(request):
+    if request.method=='POST':
+        vm_name=request.POST.get('vm_name').strip()
+        ssh_key = request.POST.get('ssh_public_key', '').strip()
 
-def vm(request):
-    return render(request,'vm.html')
-
+        vm=VirtualMachine(user=request.user,vm_name=vm_name, ssh_public_key=ssh_key)
+        #VirtualMachine.objects.create
+        vm.save()
+        return redirect('index')
+   
+@login_required
 def later(request):
     return render(request,'later.html')
