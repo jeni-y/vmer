@@ -4,12 +4,17 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
-from .form import VmForm
+from .models import VirtualMachine
 
-import json
-import os
-import subprocess
-import tempfile
+
+
+# Create your views here.
+def login(request):
+    return render(request,'login.html')
+
+def register(request):
+    return render(request,'register.html')
+
 
 def login_verify(request):
     error = None
@@ -75,63 +80,17 @@ def home(request):
 @login_required
 def index(request):
     return render(request,'index.html',{'username':request.user.username})
-
 @login_required
-def vm(request):
-    error = None
-    if request.method == "POST":
-        form = VmForm(request.POST)
-        if form.is_valid():
-           
-            vm_instance = form.save(commit=False)
-            vm_instance.username = request.user
-            vm_instance.save()
+def vm_data(request):
+    if request.method=='POST':
+        vm_name=request.POST.get('vm_name').strip()
+        ssh_key = request.POST.get('ssh_public_key', '').strip()
 
-          
-            json_data = {
-                "vm_name": vm_instance.vm_name,
-                "ssh_key": vm_instance.ssh_key,
-                "user": request.user.username,
-            }
-
-            with tempfile.NamedTemporaryFile(
-                mode="w", delete=False, suffix=".json"
-            ) as temp_file:
-                json.dump(json_data, temp_file, indent=4)
-                temp_file_path = temp_file.name  
-
-            try:
-                binary_path = "/absolute/path/to/your/vmpro"  
-                command = [binary_path, temp_file_path]
-
-               
-                result = subprocess.run(
-                    command, capture_output=True, text=True, check=True
-                )
-
-
-                print("C Code Output:", result.stdout)
-
-            except subprocess.CalledProcessError as e:
-               
-                error = f"Execution failed: {e.stderr}"
-                print("C Code Error:", e.stderr)
-
-            finally:
-
-                if os.path.exists(temp_file_path):
-                    os.remove(temp_file_path)
-
-            if not error:
-                return redirect("index")  
-        else:
-            error = "Invalid form submission. Check your fields."
-    else:
-        form = VmForm()
-
-    return render(request, "vm.html", {"form": form, "error": error})
-
-
-
+        vm=VirtualMachine(user=request.user,vm_name=vm_name, ssh_public_key=ssh_key)
+        #VirtualMachine.objects.create
+        vm.save()
+        return redirect('index')
+   
+@login_required
 def later(request):
     return render(request,'later.html')
